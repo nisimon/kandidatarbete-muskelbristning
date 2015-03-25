@@ -1,0 +1,5 @@
+1 - Select data path
+2 - Select measurements
+3 - Load measurement data
+4 - Plot loaded data
+99 - Exit
