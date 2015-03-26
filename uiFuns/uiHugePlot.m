@@ -1,13 +1,11 @@
 % Plot numPlots*numPlots S-parameters with the ability to scroll between
 % different parameters
 
-function [] = uiHugePlot(xDataSet, yDataSet, measNames, numPlots)
+function [] = uiHugePlot(dataSet, numPlots)
     fig = figure('units','normalized','outerposition',[0 0.05 1 0.95]);
     
-    % There are n*n s-parameters and num measurements of each
-    dataSize = size(xDataSet);
-    n = dataSize(1);
-    numMeas = dataSize(4);
+    % There are n*n s-parameters
+    n = sqrt(length(dataSet));
     
     % Scroll variables
     x = 0;
@@ -20,6 +18,12 @@ function [] = uiHugePlot(xDataSet, yDataSet, measNames, numPlots)
                 % Calculate which S-parameters to draw
                 s1 = y + i;
                 s2 = x + j;
+                SParam = cellstr(strcat('S',num2str(s1),'_',num2str(s2)));
+                
+                % Find index of S-parameter in data set
+                % Assume one instance of each S-parameter
+                sIdx = find(strcmp([dataSet.S],SParam));
+                sIdx = sIdx(1);
                 
                 % Select and clear the correct subplot
                 currPlot = (i-1)*numPlots + j;
@@ -27,9 +31,13 @@ function [] = uiHugePlot(xDataSet, yDataSet, measNames, numPlots)
                 hold on;
                 
                 % Draw measurements in subplot
-                for k=1:numMeas
-                    xData = squeeze(xDataSet(s1,s2,:,k));
-                    yData = squeeze(yDataSet(s1,s2,:,k));
+                for k=1:length(dataSet(sIdx).meas)
+                    xData = dataSet(sIdx).meas(k).data(:,1);
+                    complexYData = dataSet(sIdx).meas(k).data(:,2);
+                    
+                    %Add multiple modes for plotting data
+                    yData = 20*log10(abs(complexYData));
+                    
                     % Create a color for the line
                     color = [mod(k*0.3,1) mod(k*0.2,1) mod(k*0.7,1)];
                     plot(xData,yData,'Color',color);
@@ -37,9 +45,8 @@ function [] = uiHugePlot(xDataSet, yDataSet, measNames, numPlots)
                 end
                 
                 % Create legend
-                if ~isempty(measNames) && currPlot == 1
-                    legend(measNames,'Interpreter','none','Location','best');
-                end
+                legend([dataSet(sIdx).meas.name],...
+                    'Interpreter','none','Location','best');
             end
         end
     end

@@ -25,10 +25,9 @@ while choice ~= 99
         case 2 % Select measurements
             measPaths = uiSelectMeas(dataPath);
         case 3 % Load measurements
-            [ nnMultFreq, nnMultTrans, nnMultPhase, measNames ] ...
-                = loadAllData( measPaths, n );
+            dataSet = loadAllData( measPaths );
         case 4 % Plot loaded measurements
-            uiHugePlot(nnMultFreq, nnMultTrans, measNames, 2);
+            uiHugePlot(dataSet, 2);
         case 99
             disp('Goodbye');
         otherwise

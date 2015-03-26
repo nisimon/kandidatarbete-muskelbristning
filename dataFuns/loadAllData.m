@@ -1,29 +1,35 @@
-function [ nnMultFreq, nnMultTrans, nnMultPhase, measNames ] = loadAllData( paths, n )
+function dataSet = loadAllData( paths )
 %LOADALLDATA Summary of this function goes here
 %   Detailed explanation goes here
 
     % Assume that all data is equal in size, only check first one
-    [dataLength, ~] = queryData(paths{1});
-
-    % Initialize data matrices
-    nnMultFreq = zeros(n,n,dataLength, length(paths));
-    nnMultTrans = zeros(n,n,dataLength, length(paths));
-    nnMultPhase = zeros(n,n,dataLength, length(paths));
-
-    % Get names of measurements
-    measNames = cell(1,length(paths));
-    for i = 1:length(paths)
-        measNames(i) = getName(paths{i});
-    end
+    [~, numFiles] = queryData(paths{1});
+    n = sqrt(numFiles);
+    numMeas = length(paths);
+    
+    % Initialize data structure
+    emptyCells = cell(1, n*n);
+    dataSet = struct('S', emptyCells, ...
+                    'meas', emptyCells);
 
     % Loop through all s-parameters
     for i=1:n
         for j=1:n
-            % Load one set of data into each column
-            for k=1:length(paths)
-                [nnMultTrans(i,j,:,k),nnMultPhase(i,j,:,k),nnMultFreq(i,j,:,k)] = loadData(paths{k},i,j);
+            SParam = cellstr(strcat('S',num2str(i),'_',num2str(j)));
+            % Load one set of data into the structure
+            emptyCells = cell(1, numMeas);
+            measData = struct('name',emptyCells,'data',emptyCells);
+            for k=1:numMeas
+                loadedData = loadData(paths{k},i,j);
+                name = getName(paths{k});
+                measData(k).name = name;
+                measData(k).data = loadedData;
             end
+            idx = (i-1)*n + j;
+            dataSet(idx).S = SParam;
+            dataSet(idx).meas = measData;
         end
     end
+    
 end
 
