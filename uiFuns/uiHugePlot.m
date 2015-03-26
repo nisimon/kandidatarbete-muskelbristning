@@ -1,8 +1,9 @@
 % Plot numPlots*numPlots S-parameters with the ability to scroll between
 % different parameters
 
-function [] = uiHugePlot(dataSet, numPlots)
+function [] = uiHugePlot(dataSet)
     fig = figure('units','normalized','outerposition',[0 0.05 1 0.95]);
+    numPlots = 2;
     
     % There are n*n s-parameters
     n = sqrt(length(dataSet));

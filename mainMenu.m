@@ -27,7 +27,7 @@ while choice ~= 99
         case 3 % Load measurements
             dataSet = loadAllData( measPaths );
         case 4 % Plot loaded measurements
-            uiHugePlot(dataSet, 2);
+            uiHugePlot(dataSet);
         case 99
             disp('Goodbye');
         otherwise
