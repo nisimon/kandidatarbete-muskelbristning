@@ -20,7 +20,7 @@ classdef MProcessed
                                     'S',sParamCells);
                 for i = 1:numReps;
                     % Sum each S-parameter over all repetitions
-                    tempSParams = getSParams(mReps{i});
+                    tempSParams = getAllSParams(mReps{i});
                     for j = 1:length(tempSParams)
                         if i == 1
                             % Copy S-Parameters first iteration
@@ -29,6 +29,9 @@ classdef MProcessed
                             SPStruct(j).S = getComplexData(tempSParams{j});
                         else
                             % Sum S-parameters following iterations
+                            if length(tempSParams) ~= length(SPStruct)
+                                error('Mismatch in number of S-parameters');
+                            end
                             currName = getName(tempSParams{j});
                             currIdx =...
                                 find(strcmp({SPStruct.name},currName));
@@ -53,6 +56,35 @@ classdef MProcessed
                 
                 obj.SParams = sParamCells;
             end
+        end
+        
+        function SP = getSParam(obj, SName)
+            SPidx = 0;
+            found = 0;
+            i = 1;
+            
+            while i <= length(obj.SParams) && found == 0
+                if strcmp(getName(obj.SParams{i}),SName)
+                    SPidx = i;
+                    found = 1;
+                end
+                i = i + 1;
+            end
+            
+            if found == 0
+                error('S-parameter %s not found in repetition %s',...
+                    SName, obj.rName);
+            end
+            
+            SP = obj.SParams{SPidx};
+        end
+        
+        function SPs = getAllSParams(obj)
+            SPs = obj.SParams;
+        end
+        
+        function numSP = getNumSParams(obj)
+            numSP = length(obj.SParams);
         end
     end
     

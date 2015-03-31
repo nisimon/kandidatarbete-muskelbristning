@@ -44,6 +44,34 @@ classdef Measurement
             % Create processed measurement
             obj.mProcessed = MProcessed(obj.mReps);
         end
+        
+        function repNames = getRepNames(obj)
+            repNames = cell(1,length(obj.mReps));
+            for i = 1:length(obj.mReps)
+                repNames{i} = getName(obj.mReps{i});
+            end
+        end
+        
+        function allMeas = getAllMeas(obj)
+            allMeas = cell(1, length(obj.mReps) + 1);
+            for i = 1:length(obj.mReps)
+                allMeas{i} = obj.mReps{i};
+            end
+            allMeas{end} = obj.mProcessed;
+        end
+        
+        function n = getN(obj)
+            % Returns n, there are n*n S-parameters for each measurement
+            % Throws error if n is not equal for all repetitions
+            tempN = sqrt(getNumSParams(obj.mReps{1}));
+            for i = 2:length(obj.mReps)
+                if sqrt(getNumSParams(obj.mReps{i})) ~= tempN
+                    error('Mismatch in number of S-parameters');
+                end
+            end
+            
+            n = tempN;
+        end
     end
     
 end

@@ -3,7 +3,9 @@ classdef UiHugePlot < handle
     %   Detailed explanation goes here
     
     properties
-        dataSet
+        dataClass
+        measments
+        measNames
         % There are n*n s-parameters
         n
         % Plot numPlots * numPlots S-parameters
@@ -21,13 +23,21 @@ classdef UiHugePlot < handle
     end
     
     methods
-        function obj = UiHugePlot(dataSet)
-            obj.dataSet = dataSet;
+        function obj = UiHugePlot(measments)
+            obj.dataClass = class(measments);
+            switch class(measments)
+                case 'Measurement'
+                    % There are n*n s-parameters
+                    obj.n = getN(measments);
+                    obj.measments = getAllMeas(measments);
+                    repNames = getRepNames(measments);
+                    obj.measNames = [repNames 'Processed'];
+                otherwise
+                    error('No support for plotting class %s', obj.dataClass);
+            end
+            
             obj.fig = figure('units','normalized','outerposition',[0 0.05 1 0.95]);
             obj.numPlots = 2;
-
-            % There are n*n s-parameters
-            obj.n = getN(dataSet);
 
             % Scroll variables
             obj.x = 0;
@@ -125,10 +135,13 @@ classdef UiHugePlot < handle
                     % Calculate which S-parameters to draw
                     s1 = obj.y + i;
                     s2 = obj.x + j;
-                    SParam = cellstr(strcat('S',num2str(s1),'_',num2str(s2)));
+                    SParam = strcat('S',num2str(s1),'_',num2str(s2));
 
                     % Get array of measurements
-                    meas = getMeas(obj.dataSet, SParam);
+                    meas = cell(1,length(obj.measments));
+                    for k = 1:length(meas)
+                        meas{k} = getSParam(obj.measments{k}, SParam);
+                    end
 
                     % Select and clear the correct subplot
                     currPlot = (i-1)*obj.numPlots + j;
@@ -141,7 +154,7 @@ classdef UiHugePlot < handle
                         xData = getFreq(meas{k});
 
                         %Add multiple modes for plotting data
-                        yData = getTrans(meas{k});
+                        yData = getdBData(meas{k});
 
                         % Create a color for the line
                         color = [mod(k*0.3,1) mod(k*0.2,1) mod(k*0.7,1)];
@@ -149,9 +162,11 @@ classdef UiHugePlot < handle
                         title(strcat('S',num2str(s1),'\_',num2str(s2)));
                     end
 
-                    % Create legend
-%                     legend([dataSet(sIdx).meas.name],...
-%                         'Interpreter','none','Location','best');
+                    %Create legend
+                    if length(obj.measNames) >= 1
+                        legend(obj.measNames,...
+                            'Interpreter','none','Location','best');
+                    end
                 end
             end
         end
