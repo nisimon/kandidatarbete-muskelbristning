@@ -55,6 +55,10 @@ classdef MClass
             n = tempN;
         end
         
+        function numMeases = getNumMeases(obj)
+            numMeases = length(obj.measurements);
+        end
+        
         function procMeases = getProcMeases(obj)
             procMeases = cell(1,length(obj.measurements));
             for i = 1:length(obj.measurements)

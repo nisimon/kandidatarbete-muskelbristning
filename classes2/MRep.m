@@ -1,10 +1,9 @@
-classdef MRep
+classdef MRep < SubMeas
     %MREP Class containing a repetition of a measurement
     %   Consists of an array of SParams
     
     properties
         rName
-        SParams
     end
     
     methods
@@ -35,36 +34,6 @@ classdef MRep
         function name = getName(obj)
             name = obj.rName;
         end
-        
-        function SP = getSParam(obj, SName)
-            SPidx = 0;
-            found = 0;
-            i = 1;
-            
-            while i <= length(obj.SParams) && found == 0
-                if strcmp(getName(obj.SParams{i}),SName)
-                    SPidx = i;
-                    found = 1;
-                end
-                i = i + 1;
-            end
-            
-            if found == 0
-                error('S-parameter %s not found in repetition %s',...
-                    SName, obj.rName);
-            end
-            
-            SP = obj.SParams{SPidx};
-        end
-        
-        function SPs = getAllSParams(obj)
-            SPs = obj.SParams;
-        end
-        
-        function numSP = getNumSParams(obj)
-            numSP = length(obj.SParams);
-        end
     end
-    
 end
 
