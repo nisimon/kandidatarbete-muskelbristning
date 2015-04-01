@@ -45,6 +45,10 @@ classdef Measurement
             obj.mProcessed = MProcessed(obj.mReps);
         end
         
+        function mName = getName(obj)
+            mName = obj.mName;
+        end
+        
         function repNames = getRepNames(obj)
             repNames = cell(1,length(obj.mReps));
             for i = 1:length(obj.mReps)
@@ -58,6 +62,10 @@ classdef Measurement
                 allMeas{i} = obj.mReps{i};
             end
             allMeas{end} = obj.mProcessed;
+        end
+        
+        function procMeas = getProcMeas(obj)
+            procMeas = obj.mProcessed;
         end
         
         function n = getN(obj)

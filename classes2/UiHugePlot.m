@@ -23,14 +23,17 @@ classdef UiHugePlot < handle
     end
     
     methods
-        function obj = UiHugePlot(measments)
-            obj.dataClass = class(measments);
-            switch class(measments)
+        function obj = UiHugePlot(dataSet)
+            obj.dataClass = class(dataSet);
+            switch class(dataSet)
+                case 'MClass'
+                    obj.n = getN(dataSet);
+                    obj.measments = getProcMeases(dataSet);
+                    obj.measNames = getMeasNames(dataSet);
                 case 'Measurement'
-                    % There are n*n s-parameters
-                    obj.n = getN(measments);
-                    obj.measments = getAllMeas(measments);
-                    repNames = getRepNames(measments);
+                    obj.n = getN(dataSet);
+                    obj.measments = getAllMeas(dataSet);
+                    repNames = getRepNames(dataSet);
                     obj.measNames = [repNames 'Processed'];
                 otherwise
                     error('No support for plotting class %s', obj.dataClass);

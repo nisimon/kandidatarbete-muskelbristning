@@ -13,7 +13,7 @@ classdef MProcessed
                 error('Must supply at least one repetition');
             elseif numReps == 1
                 % If 1 repetition, just copy the S-parameters
-                obj.SParams = getSParams(mReps{1});
+                obj.SParams = getAllSParams(mReps{1});
             else
                 sParamCells = cell(1,getNumSParams(mReps{1}));
                 SPStruct = struct('name',sParamCells,'freq',sParamCells,...

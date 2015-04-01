@@ -18,7 +18,11 @@ classdef MClass
             % Get name of class
             % Same as name of folder
             pathComponents = strsplit(path,filesep);
-            obj.cName = pathComponents{end};
+            if isempty(pathComponents{end})
+                obj.cName = pathComponents{end - 1};
+            else
+                obj.cName = pathComponents{end};
+            end
             
             % Get list of paths to folders in directory
             listing = dir(path);
@@ -35,6 +39,33 @@ classdef MClass
             obj.measurements = cell(1,length(measPaths));
             for i = 1:length(obj.measurements)
                 obj.measurements{i} = Measurement(measPaths{i});
+            end
+        end
+        
+        function n = getN(obj)
+            % Returns n, there are n*n S-parameters for each measurement
+            % Throws error if n is not equal for all measurements
+            tempN = getN(obj.measurements{1});
+            for i = 2:length(obj.measurements)
+                if getN(obj.measurements{i}) ~= tempN
+                    error('Mismatch in number of S-parameters');
+                end
+            end
+            
+            n = tempN;
+        end
+        
+        function procMeases = getProcMeases(obj)
+            procMeases = cell(1,length(obj.measurements));
+            for i = 1:length(obj.measurements)
+                procMeases{i} = getProcMeas(obj.measurements{i});
+            end
+        end
+        
+        function measNames = getMeasNames(obj)
+            measNames = cell(1,length(obj.measurements));
+            for i = 1:length(obj.measurements)
+                measNames{i} = getName(obj.measurements{i});
             end
         end
     end
