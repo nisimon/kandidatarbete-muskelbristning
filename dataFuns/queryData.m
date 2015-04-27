@@ -4,9 +4,9 @@ function [numPoints, numDataFiles]=queryData(path)
     currDir = pwd;
     cd(path);
 
-    files = dir;
+    files = dir('*.m');
 
-    numDataFiles = length(files) - 2; % Do not count '.' and '..'
+    numDataFiles = length(files); % Do not count '.' and '..'
 
     fid = fopen(files(3).name, 'rb');
     %# Get file size.

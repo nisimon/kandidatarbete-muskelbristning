@@ -3,8 +3,8 @@ function dataSet = loadAllData( paths )
 %   Detailed explanation goes here
 
     % Assume that all data is equal in size, only check first one
-    [~, numFiles] = queryData(paths{1});
-    n = sqrt(numFiles);
+    [~, numMFiles] = queryData(paths{1});
+    n = sqrt(numMFiles);
     numMeas = length(paths);
     
     % Initialize data structure

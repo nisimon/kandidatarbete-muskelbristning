@@ -143,7 +143,8 @@ classdef UiHugePlot < handle
                     % Get array of measurements
                     meas = cell(1,length(obj.measments));
                     for k = 1:length(meas)
-                        meas{k} = getSParam(obj.measments{k}, SParam);
+                        meas{k} = getSParams(obj.measments{k}, {SParam});
+                        meas{k} = meas{k}{1}; % Unpack cell array
                     end
 
                     % Select and clear the correct subplot

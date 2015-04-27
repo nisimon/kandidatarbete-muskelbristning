@@ -1,9 +1,10 @@
-classdef SParam
+classdef SParam < handle
     %SPARAM Class containing the data of an S-parameter
     %   Can be constructed from either a struct of data or a data file
     %   Contains methods to get the data in different forms
     
     properties
+        isexcluded
         SName
         dataArray
     end
@@ -37,6 +38,11 @@ classdef SParam
                 obj.dataArray = [freq S];
             end
 
+            obj.isexcluded = false;
+        end
+        
+        function [] = exclude(obj,tf)
+            obj.isexcluded = tf;
         end
         
         function name = getName(obj)

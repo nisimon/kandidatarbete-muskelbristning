@@ -4,8 +4,8 @@ clc;
 clear;
 addpath('uiFuns');
 addpath('dataFuns');
-protDir = uigetdir('', 'Select Folder of protected functions');
-addpath(protDir);
+%protDir = uigetdir('', 'Select Folder of protected functions');
+%addpath(protDir);
 
 % Initialize variables
 n = 14; % n^2 = number of S-parameters in measurements

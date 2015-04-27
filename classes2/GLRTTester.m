@@ -1,4 +1,4 @@
-classdef GLRTTester
+classdef GLRTTester < handle
     %GLRTTESTER Class to test the performance of the GLRT classifier
     %   Detailed explanation goes here
     
@@ -6,6 +6,7 @@ classdef GLRTTester
         glrtPath
         classes
         knownClasses
+        goodSParams
     end
     
     methods
@@ -18,6 +19,7 @@ classdef GLRTTester
                 obj.knownClasses = [obj.knownClasses...
                     i*ones(1,getNumMeases(classes{i}))];
             end
+            obj.goodSParams = cell(0);
         end
         
         function predClasses = looCrossValidate(obj)
@@ -29,7 +31,7 @@ classdef GLRTTester
                 procMeases = getProcMeases(obj.classes{i});
                 for j = 1:length(procMeases)
                     dataMatrix = [dataMatrix...
-                        vectorize(procMeases{j})];
+                        vectorize(procMeases{j},obj.goodSParams)];
                 end
             end
             
@@ -55,6 +57,10 @@ classdef GLRTTester
         
         function knownClasses = getKnownClasses(obj)
             knownClasses = obj.knownClasses;
+        end
+        
+        function [] = setGoodSParams(obj,goodSPs)
+            obj.goodSParams = goodSPs;
         end
     end
     

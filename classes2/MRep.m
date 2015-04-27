@@ -29,6 +29,18 @@ classdef MRep < SubMeas
             for i = 1:length(obj.SParams)
                 obj.SParams{i} = SParam(mFilePaths{i});
             end
+            
+            % Add exclusions if exclusion file 'excl.txt' exists in path
+            % 'excl.txt' should contain a regexp to match against the
+            % names of the S-parameters
+            if exist(strcat(path, filesep, 'excl.txt'), 'file') == 2
+                re = fileread(strcat(path, filesep, 'excl.txt'));
+                for i = 1:length(obj.SParams)
+                    if ~isempty(regexp(obj.SParams{i}.getName,re,'ONCE'))
+                        obj.SParams{i}.exclude(true)
+                    end
+                end
+            end
         end
         
         function name = getName(obj)

@@ -26,7 +26,7 @@ function paths = uiSelectMeas(path)
             'SelectionMode','multiple',...
             'ListString',folderNames);
         
-        % Add 2 to indexes to compensate for ignoring '.' and '..'
+        % Add 3 to indexes to compensate for ignoring '.' and '..'
         s = s + 2;
 
         % Loops through all folders choosen from the list dialog

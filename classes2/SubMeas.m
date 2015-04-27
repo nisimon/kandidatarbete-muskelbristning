@@ -7,25 +7,29 @@ classdef SubMeas
     end
     
     methods
-        function SP = getSParam(obj, SName)
-            SPidx = 0;
-            found = 0;
-            i = 1;
-            
-            while i <= length(obj.SParams) && found == 0
-                if strcmp(getName(obj.SParams{i}),SName)
-                    SPidx = i;
-                    found = 1;
+        function SPs = getSParams(obj, SNames)
+        % Returns a cell array of S-parameters with names matching SNames
+            SPs = cell(size(SNames));
+            for i=1:length(SPs)
+                SPidx = 0;
+                found = 0;
+                j = 1;
+
+                while j <= length(obj.SParams) && found == 0
+                    if strcmp(getName(obj.SParams{j}),SNames{i})
+                        SPidx = j;
+                        found = 1;
+                    end
+                    j = j + 1;
                 end
-                i = i + 1;
+
+                if found == 0
+                    error('S-parameter %s not found',...
+                        SNames{i});
+                end
+
+                SPs{i} = obj.SParams{SPidx};
             end
-            
-            if found == 0
-                error('S-parameter %s not found',...
-                    SName);
-            end
-            
-            SP = obj.SParams{SPidx};
         end
         
         function SPs = getAllSParams(obj)
@@ -36,16 +40,19 @@ classdef SubMeas
             numSP = length(obj.SParams);
         end
         
-        function vector = vectorize(obj)
-            % Create list of S-parameters sorted by name
-            SNames = cell(size(obj.SParams));
-            for i = 1:length(SNames)
-                SNames{i} = getName(obj.SParams{i});
+        function vector = vectorize(obj, SNames)
+            % Create list of vectorized S-parameters sorted by name
+            % if no names given, use all S-parameters
+            if isempty(SNames)
+                SNames = cell(size(obj.SParams));
+                for i = 1:length(SNames)
+                    SNames{i} = getName(obj.SParams{i});
+                end
             end
             
-            [~, I] = sort(SNames);
+            [sortedSNames, ~] = sort(SNames);
             
-            sortedSParams = obj.SParams(I);
+            sortedSParams = obj.getSParams(sortedSNames);
             
             vector = [];
             
