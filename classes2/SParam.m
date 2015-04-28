@@ -2,9 +2,10 @@ classdef SParam < handle
     %SPARAM Class containing the data of an S-parameter
     %   Can be constructed from either a struct of data or a data file
     %   Contains methods to get the data in different forms
+    %   Can be excluded if the measurement is bad
     
     properties
-        isexcluded
+        excl
         SName
         dataArray
     end
@@ -14,7 +15,8 @@ classdef SParam < handle
             if isstruct(indata)
                 % Construct an S-parameter from a struct of data
                 obj.SName = indata.name;
-                obj.dataArray = [indata.freq indata.S]; 
+                obj.dataArray = [indata.freq indata.S];
+                obj.excl = indata.excl;
             else
                 % Construct an S-parameter from the path to a data file
                 if isdir(indata)
@@ -36,13 +38,16 @@ classdef SParam < handle
 
                 obj.SName = tempName{1};
                 obj.dataArray = [freq S];
+                obj.excl = false;
             end
-
-            obj.isexcluded = false;
         end
         
         function [] = exclude(obj,tf)
-            obj.isexcluded = tf;
+            obj.excl = tf;
+        end
+        
+        function excl = isExcluded(obj)
+            excl = obj.excl;
         end
         
         function name = getName(obj)

@@ -135,7 +135,7 @@ classdef UiHugePlot < handle
         % Function to draw plots
             for i=1:obj.numPlots
                 for j=1:obj.numPlots
-                    % Calculate which S-parameters to draw
+                    % Calculate which S-parameter to draw
                     s1 = obj.y + i;
                     s2 = obj.x + j;
                     SParam = strcat('S',num2str(s1),'_',num2str(s2));
@@ -143,8 +143,13 @@ classdef UiHugePlot < handle
                     % Get array of measurements
                     meas = cell(1,length(obj.measments));
                     for k = 1:length(meas)
-                        meas{k} = getSParams(obj.measments{k}, {SParam});
-                        meas{k} = meas{k}{1}; % Unpack cell array
+                        try
+                            SP = getSParams(obj.measments{k}, {SParam});
+                            meas{k} = SP{1};
+                        catch
+                            warning('Problem loading S-parameter %s ',...
+                                SParam);
+                        end
                     end
 
                     % Select and clear the correct subplot
@@ -152,23 +157,33 @@ classdef UiHugePlot < handle
                     sp = subplot(obj.numPlots,obj.numPlots,currPlot);
                     cla(sp);
                     hold on;
+                    title(strcat('S',num2str(s1),'\_',num2str(s2)));
 
                     % Draw measurements in subplot
                     for k=1:length(meas)
-                        xData = getFreq(meas{k});
+                        if ~isempty(meas{k})
+                            xData = getFreq(meas{k});
 
-                        %Add multiple modes for plotting data
-                        yData = getdBData(meas{k});
+                            %Add multiple modes for plotting data
+                            yData = getdBData(meas{k});
 
-                        % Create a color for the line
-                        color = [mod(k*0.3,1) mod(k*0.2,1) mod(k*0.7,1)];
-                        plot(xData,yData,'Color',color);
-                        title(strcat('S',num2str(s1),'\_',num2str(s2)));
+                            % Create a color for the line
+                            color = [mod(k*0.3,1) mod(k*0.2,1) mod(k*0.7,1)];
+                            
+                            % Dash line if measurement is excluded
+                            if isExcluded(meas{k})
+                                linespec = '--';
+                            else
+                                linespec = '-';
+                            end
+                            plot(xData,yData,linespec,'Color',color);
+                        end
                     end
-
+                    
+                    %measIdxs = find(~cellfun('isempty', meas));
                     %Create legend
                     if length(obj.measNames) >= 1
-                        legend(obj.measNames,...
+                        legend(obj.measNames(~cellfun('isempty', meas)),...
                             'Interpreter','none','Location','best');
                     end
                 end
