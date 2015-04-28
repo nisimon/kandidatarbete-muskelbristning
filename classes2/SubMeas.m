@@ -1,4 +1,4 @@
-classdef SubMeas
+classdef SubMeas < handle
     %SUBMEAS Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -40,6 +40,12 @@ classdef SubMeas
             numSP = length(obj.SParams);
         end
         
+        function SPNames = getIncludedSPNames(obj)
+            incIdxs = ~cellfun(@isExcluded,obj.SParams);
+            SPNames = cellfun(@getName,obj.SParams(incIdxs),...
+                'UniformOutput',false);
+        end
+        
         function vector = vectorize(obj, SNames)
             % Create list of vectorized S-parameters sorted by name
             % if no names given, use all S-parameters
@@ -58,6 +64,9 @@ classdef SubMeas
             
             % TODO: Preallocate vector
             for i = 1:length(sortedSParams)
+                if isExcluded(sortedSParams{i})
+                    error('Can''t vectorize excluded S-parameter');
+                end
                 vector = [vector; getComplexData(sortedSParams{i})];
             end
         end

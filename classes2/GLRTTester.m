@@ -25,13 +25,35 @@ classdef GLRTTester < handle
         function predClasses = looCrossValidate(obj)
             predClasses = zeros(size(obj.knownClasses));
             
+            if ~isempty(obj.goodSParams)
+                % Prioritize specified S-parameters
+                vectSParams = obj.goodSParams;
+            else
+                vectSParams = {};
+                % Find names of S-parameters included in all measurements
+                for i = 1:length(obj.classes)
+                    procMeases = getProcMeases(obj.classes{i});
+                    for j = 1:length(procMeases)
+                        if isempty(vectSParams)
+                            vectSParams =...
+                                getIncludedSPNames(procMeases{j});
+                        else
+                            vectSParams = intersect(vectSParams,...
+                                getIncludedSPNames(procMeases{j}));
+                        end
+                    end
+                end
+            end
+            
+            disp(vectSParams);
+            
             % TODO: Proper function for preallocating data matrix
             dataMatrix = [];
             for i = 1:length(obj.classes)
                 procMeases = getProcMeases(obj.classes{i});
                 for j = 1:length(procMeases)
                     dataMatrix = [dataMatrix...
-                        vectorize(procMeases{j},obj.goodSParams)];
+                        vectorize(procMeases{j},vectSParams)];
                 end
             end
             
