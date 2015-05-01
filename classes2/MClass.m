@@ -42,6 +42,10 @@ classdef MClass
             end
         end
         
+        function name = getName(obj)
+            name = obj.cName;
+        end
+        
         function n = getN(obj)
             % Returns n, there are n*n S-parameters for each measurement
             % Throws error if n is not equal for all measurements

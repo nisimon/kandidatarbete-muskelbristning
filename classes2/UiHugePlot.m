@@ -23,20 +23,52 @@ classdef UiHugePlot < handle
     end
     
     methods
-        function obj = UiHugePlot(dataSet)
-            obj.dataClass = class(dataSet);
-            switch class(dataSet)
-                case 'MClass'
-                    obj.n = getN(dataSet);
-                    obj.measments = getProcMeases(dataSet);
-                    obj.measNames = getMeasNames(dataSet);
-                case 'Measurement'
-                    obj.n = getN(dataSet);
-                    obj.measments = getAllMeas(dataSet);
-                    repNames = getRepNames(dataSet);
-                    obj.measNames = [repNames 'Processed'];
-                otherwise
-                    error('No support for plotting class %s', obj.dataClass);
+        function obj = UiHugePlot(dataSets)
+            obj.measments = {};
+            obj.measNames = [];
+            for i=1:length(dataSets)
+                dataSet = dataSets{i};
+                if i == 1
+                    obj.dataClass = class(dataSet);
+                else
+                    if ~strcmp(obj.dataClass,class(dataSet))
+                        error('Must plot objects from same class')
+                    end
+                end
+                switch class(dataSet)
+                    case 'MClass'
+                        if i == 1
+                            obj.n = getN(dataSet);
+                        else
+                            if obj.n ~= getN(dataSet)
+                                error('Different n between datasets');
+                            end
+                        end
+                        obj.measments = [obj.measments...
+                            getProcMeases(dataSet)];
+                        mNames = strcat(getName(dataSet),...
+                            ': ', getMeasNames(dataSet));
+                        obj.measNames = [obj.measNames...
+                            mNames];
+                    case 'Measurement'
+                        if i == 1
+                            obj.n = getN(dataSet);
+                        else
+                            if obj.n ~= getN(dataSet)
+                                error('Different n between datasets');
+                            end
+                        end
+                        obj.measments = [obj.measments...
+                            getAllMeas(dataSet)];
+                        repNames = strcat(getName(dataSet),...
+                            ': ', getRepNames(dataSet));
+                        procName = strcat(getName(dataSet),...
+                            ': ', 'processed');
+                        obj.measNames = [obj. measNames...
+                            repNames procName];
+                    otherwise
+                        error('No support for plotting class %s', obj.dataClass);
+                end
             end
             
             obj.fig = figure('units','normalized','outerposition',[0 0.05 1 0.95]);
