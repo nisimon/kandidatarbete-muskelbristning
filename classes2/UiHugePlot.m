@@ -6,8 +6,6 @@ classdef UiHugePlot < handle
         dataClass
         measments
         measNames
-        % There are n*n s-parameters
-        n
         % Plot numPlots * numPlots S-parameters
         numPlots
         % Scroll variables
@@ -36,14 +34,7 @@ classdef UiHugePlot < handle
                     end
                 end
                 switch class(dataSet)
-                    case 'MClass'
-                        if i == 1
-                            obj.n = getN(dataSet);
-                        else
-                            if obj.n ~= getN(dataSet)
-                                error('Different n between datasets');
-                            end
-                        end
+                    case 'MClass'                        
                         obj.measments = [obj.measments...
                             getProcMeases(dataSet)];
                         mNames = strcat(getName(dataSet),...
@@ -51,13 +42,6 @@ classdef UiHugePlot < handle
                         obj.measNames = [obj.measNames...
                             mNames];
                     case 'Measurement'
-                        if i == 1
-                            obj.n = getN(dataSet);
-                        else
-                            if obj.n ~= getN(dataSet)
-                                error('Different n between datasets');
-                            end
-                        end
                         obj.measments = [obj.measments...
                             getAllMeas(dataSet)];
                         repNames = strcat(getName(dataSet),...
@@ -120,7 +104,7 @@ classdef UiHugePlot < handle
         function scrollX(obj, value)
             % Calculate and if possible set new x value
             newX = obj.x + value;
-            if (newX >= 0 && newX <= obj.n - obj.numPlots)
+            if (newX >= 0)
                 obj.x = newX;
             end
 
@@ -128,9 +112,6 @@ classdef UiHugePlot < handle
             if (newX <= 0)
                 set(obj.btnLeft, 'enable', 'off')
                 set(obj.btnRight, 'enable', 'on')
-            elseif (newX >= obj.n - obj.numPlots)
-                set(obj.btnLeft, 'enable', 'on')
-                set(obj.btnRight, 'enable', 'off')
             else
                 set(obj.btnLeft, 'enable', 'on')
                 set(obj.btnRight, 'enable', 'on')            
@@ -143,7 +124,7 @@ classdef UiHugePlot < handle
         function scrollY(obj, value)
             % Calculate and if possible set new y value
             newY = obj.y + value;
-            if (newY >= 0 && newY <= obj.n - obj.numPlots)
+            if (newY >= 0)
                 obj.y = newY;
             end
 
@@ -151,9 +132,6 @@ classdef UiHugePlot < handle
             if (newY <= 0)
                 set(obj.btnUp, 'enable', 'off')
                 set(obj.btnDown, 'enable', 'on')
-            elseif (newY >= obj.n - obj.numPlots)
-                set(obj.btnUp, 'enable', 'on')
-                set(obj.btnDown, 'enable', 'off')
             else
                 set(obj.btnUp, 'enable', 'on')
                 set(obj.btnDown, 'enable', 'on')            

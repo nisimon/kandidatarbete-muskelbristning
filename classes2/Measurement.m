@@ -71,19 +71,6 @@ classdef Measurement
         function procMeas = getProcMeas(obj)
             procMeas = obj.mProcessed;
         end
-        
-        function n = getN(obj)
-            % Returns n, there are n*n S-parameters for each measurement
-            % Throws error if n is not equal for all repetitions
-            tempN = sqrt(getNumSParams(obj.mReps{1}));
-            for i = 2:length(obj.mReps)
-                if sqrt(getNumSParams(obj.mReps{i})) ~= tempN
-                    error('Mismatch in number of S-parameters');
-                end
-            end
-            
-            n = tempN;
-        end
     end
     
 end

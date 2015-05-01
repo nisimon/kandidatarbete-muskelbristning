@@ -46,19 +46,6 @@ classdef MClass
             name = obj.cName;
         end
         
-        function n = getN(obj)
-            % Returns n, there are n*n S-parameters for each measurement
-            % Throws error if n is not equal for all measurements
-            tempN = getN(obj.measurements{1});
-            for i = 2:length(obj.measurements)
-                if getN(obj.measurements{i}) ~= tempN
-                    error('Mismatch in number of S-parameters');
-                end
-            end
-            
-            n = tempN;
-        end
-        
         function numMeases = getNumMeases(obj)
             numMeases = length(obj.measurements);
         end
