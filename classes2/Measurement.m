@@ -20,7 +20,11 @@ classdef Measurement
             % Get name of measurement
             % Same as name of folder
             pathComponents = strsplit(path,filesep);
-            obj.mName = pathComponents{end};
+            if isempty(pathComponents{end})
+                obj.mName = pathComponents{end - 1};
+            else
+                obj.mName = pathComponents{end};
+            end
             
             % Get list of paths to folders in directory
             listing = dir(path);
