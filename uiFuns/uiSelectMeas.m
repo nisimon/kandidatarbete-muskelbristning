@@ -32,7 +32,7 @@ function paths = uiSelectMeas(path)
         % Loops through all folders choosen from the list dialog
         a=1;
         for n=1:length(s)
-            fullPath = strcat(path,filesep,listing(s(n)).name);
+            fullPath = strcat(path,filesep,listing(folderIdxs(s(n))).name);
             % Check if the folder contains data or subfolders.
             if hasSubFolder(fullPath)
                 path_cells{a}=UserInterface2(fullPath);
