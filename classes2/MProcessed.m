@@ -6,7 +6,14 @@ classdef MProcessed < SubMeas
     end
     
     methods
-        function obj = MProcessed(mReps)
+        function obj = MProcessed(mReps, varargin)
+            % Get reference measurement if supplied
+            if length(varargin) == 1
+                mRef = varargin{1};
+            else
+                mRef = {};
+            end
+            
             numReps = length(mReps);
             if numReps <= 0
                 error('Must supply at least one repetition');
@@ -67,6 +74,29 @@ classdef MProcessed < SubMeas
                     % Calculate average for each S-parameter
                     tempS = SPStruct(i).S;
                     SPStruct(i).S = tempS./SPStruct(i).reps;
+                    
+                    % Subtract reference measurement if it exists
+                    if ~isempty(mRef)
+                        refProcMeas = getProcMeas(mRef);
+                        try
+                            refS = getSParams(refProcMeas,...
+                                {SPStruct(i).name});
+                            if isExcluded(refS{1})
+                                % Exclude S-parameter if reference
+                                % S-parameter is excluded
+                                SPStruct(i).excl = true;
+                            else
+                                SPStruct(i).S =...
+                                    abs(SPStruct(i).S) - getAmplData(refS{1});
+                            end
+                        catch E
+                            disp(E);
+                            % Set S-parameter to excluded if unable to
+                            % get reference S-parameter
+                            SPStruct(i).excl = true;
+                        end 
+                    end
+                    
                     % Construct S-parameters
                     sParamCells{i} = SParam(SPStruct(i));
                 end
@@ -74,6 +104,7 @@ classdef MProcessed < SubMeas
                 obj.SParams = sParamCells;
             end
         end
+        
     end
 end
 

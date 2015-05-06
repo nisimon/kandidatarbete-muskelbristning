@@ -63,6 +63,11 @@ classdef SParam < handle
             trans = 20*log10(abs(obj.dataArray(:,2)));
         end
         
+        function ampl = getAmplData(obj)
+        % Gets the amplitude of the S-parameter
+            ampl = abs(obj.dataArray(:,2));
+        end
+        
         function complex = getComplexData(obj)
         % Gets the raw complex data of the S-parameter
             complex = obj.dataArray(:,2);

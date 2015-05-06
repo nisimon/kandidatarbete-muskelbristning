@@ -3,9 +3,11 @@ classdef UiHugePlot < handle
     %   Detailed explanation goes here
     
     properties
+        % Measurement variables
         dataClass
         measments
         measNames
+        measColors
         % Plot numPlots * numPlots S-parameters
         numPlots
         % Scroll variables
@@ -18,12 +20,28 @@ classdef UiHugePlot < handle
         btnRight
         % Figure handle
         fig
+        % Input parser
+        p
     end
     
     methods
-        function obj = UiHugePlot(dataSets)
+        function obj = UiHugePlot(dataSets, varargin)
+            % Parse input arguments
+            obj.p = inputParser;
+            defaultShowLegend = true;
+            defaultClassColors = false;
+            defaultNumPlots = 2;
+            
+            addOptional(obj.p,'showLegend',defaultShowLegend,@islogical);
+            addOptional(obj.p,'classColors',defaultClassColors,@islogical);
+            addOptional(obj.p,'numPlots',defaultNumPlots,@isnumeric);
+            
+            parse(obj.p,varargin{:});
+            
+            % Get measurements to plot
             obj.measments = {};
             obj.measNames = [];
+            obj.measColors = {};
             for i=1:length(dataSets)
                 dataSet = dataSets{i};
                 if i == 1
@@ -34,29 +52,42 @@ classdef UiHugePlot < handle
                     end
                 end
                 switch class(dataSet)
-                    case 'MClass'                        
-                        obj.measments = [obj.measments...
-                            getProcMeases(dataSet)];
-                        mNames = strcat(getName(dataSet),...
+                    % Get measurements and measurement names depending
+                    % on the input class
+                    case 'MClass'
+                        newMeases = getProcMeases(dataSet);
+                        newNames = strcat(getName(dataSet),...
                             ': ', getMeasNames(dataSet));
-                        obj.measNames = [obj.measNames...
-                            mNames];
                     case 'Measurement'
-                        obj.measments = [obj.measments...
-                            getAllMeas(dataSet)];
+                        newMeases = getAllMeas(dataSet);
                         repNames = strcat(getName(dataSet),...
                             ': ', getRepNames(dataSet));
                         procName = strcat(getName(dataSet),...
                             ': ', 'processed');
-                        obj.measNames = [obj. measNames...
-                            repNames procName];
+                        newNames = [repNames procName];
                     otherwise
                         error('No support for plotting class %s', obj.dataClass);
                 end
+                obj.measments = [obj.measments...
+                            newMeases];
+                obj.measNames = [obj.measNames...
+                    newNames];
+                % Generate colors for the measurements
+                newColors = cell(size(newMeases));
+                for j = 1:length(newColors)
+                    r1 = 1 + sign(-mod(i,3)); % Red
+                    g1 = 1 + sign(-mod(i+1,3)); % Green
+                    b1 = 1 + sign(-mod(i+2,3)); % Blue
+                    r = min(r1 + mod(j*0.2*g1 + j*0.2*b1,0.9),1);
+                    g = min(g1 + mod(j*0.2*r1 + j*0.2*b1,0.9),1);
+                    b = min(b1 + mod(j*0.2*r1 + j*0.2*g1,0.9),1);
+                    newColors{j} = [r g b]; 
+                end
+                obj.measColors = [obj.measColors...
+                    newColors];
             end
             
             obj.fig = figure('units','normalized','outerposition',[0 0.05 1 0.95]);
-            obj.numPlots = 2;
 
             % Scroll variables
             obj.x = 0;
@@ -143,8 +174,8 @@ classdef UiHugePlot < handle
         
         function redraw(obj)
         % Function to draw plots
-            for i=1:obj.numPlots
-                for j=1:obj.numPlots
+            for i=1:obj.p.Results.numPlots
+                for j=1:obj.p.Results.numPlots
                     % Calculate which S-parameter to draw
                     s1 = obj.y + i;
                     s2 = obj.x + j;
@@ -163,8 +194,8 @@ classdef UiHugePlot < handle
                     end
 
                     % Select and clear the correct subplot
-                    currPlot = (i-1)*obj.numPlots + j;
-                    sp = subplot(obj.numPlots,obj.numPlots,currPlot);
+                    currPlot = (i-1)*obj.p.Results.numPlots + j;
+                    sp = subplot(obj.p.Results.numPlots,obj.p.Results.numPlots,currPlot);
                     cla(sp);
                     hold on;
                     title(strcat('S',num2str(s1),'\_',num2str(s2)));
@@ -174,11 +205,11 @@ classdef UiHugePlot < handle
                         if ~isempty(meas{k})
                             xData = getFreq(meas{k});
 
-                            %Add multiple modes for plotting data
+                            %TODO: Add multiple modes for plotting data
                             yData = getdBData(meas{k});
 
-                            % Create a color for the line
-                            color = [mod(k*0.3,1) mod(k*0.2,1) mod(k*0.7,1)];
+                            % Get a color for the line
+                            color = obj.measColors{k};
                             
                             % Dash line if measurement is excluded
                             if isExcluded(meas{k})
@@ -186,13 +217,17 @@ classdef UiHugePlot < handle
                             else
                                 linespec = '-';
                             end
-                            plot(xData,yData,linespec,'Color',color);
+                            if obj.p.Results.classColors
+                                plot(xData,yData,linespec,'Color',color);
+                            else
+                                plot(xData,yData,linespec);
+                            end
                         end
                     end
                     
-                    %measIdxs = find(~cellfun('isempty', meas));
                     %Create legend
-                    if length(obj.measNames) >= 1
+                    if obj.p.Results.showLegend &&...
+                            length(obj.measNames) >= 1
                         legend(obj.measNames(~cellfun('isempty', meas)),...
                             'Interpreter','none','Location','best');
                     end
