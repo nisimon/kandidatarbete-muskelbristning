@@ -13,7 +13,8 @@ classdef UiHugePlot < handle
         % Scroll variables
         x 
         y
-        % Buttons
+        % UI elements
+        popup
         btnUp
         btnDown
         btnLeft
@@ -22,6 +23,8 @@ classdef UiHugePlot < handle
         fig
         % Input parser
         p
+        % Plotting function
+        plotFunc
     end
     
     methods
@@ -30,10 +33,12 @@ classdef UiHugePlot < handle
             obj.p = inputParser;
             defaultShowLegend = true;
             defaultClassColors = false;
+            defaultVerbose = false;
             defaultNumPlots = 2;
             
             addOptional(obj.p,'showLegend',defaultShowLegend,@islogical);
             addOptional(obj.p,'classColors',defaultClassColors,@islogical);
+            addOptional(obj.p,'verbose',defaultVerbose,@islogical);
             addOptional(obj.p,'numPlots',defaultNumPlots,@isnumeric);
             
             parse(obj.p,varargin{:});
@@ -116,10 +121,28 @@ classdef UiHugePlot < handle
                     'Units', 'normalized',...
                     'Position', [0.4 0 0.2 0.04],...
                     'Callback', @obj.scrollCallback);
-            redraw(obj);
+                
+            % Create pop-up menu
+            obj.popup = uicontrol('Style', 'popup',...
+               'String', {'Amplitude [dB]','Amplitude','Phase'},...
+               'Parent',obj.fig,...
+               'Units', 'normalized',...
+               'Position', [0 0.9 .1 .1],...
+               'Callback', @obj.popupCallback);
+           
+           % Set default plotting function
+           obj.plotFunc = @getdBData;
+           
+           % Disable warnings if not in verbose mode
+           if ~obj.p.Results.verbose
+               warning('off','HugePlot:subplot:SParamFail');
+               warning('off','MATLAB:legend:PlotEmpty');
+           end
+           
+           redraw(obj);
         end
-        % Scroll functions
         
+        % Scroll functions
         function scrollCallback(obj,srcHandle,eventData)
             if srcHandle == obj.btnUp
                 scrollY(obj,-1);
@@ -172,6 +195,20 @@ classdef UiHugePlot < handle
             redraw(obj);
         end  
         
+        function popupCallback(obj,srcHandle,eventData)
+            val = get(srcHandle,'Value');
+            disp(val);
+            switch val
+                case 1
+                    obj.plotFunc = @getdBData;
+                case 2
+                    obj.plotFunc = @getAmplData;
+                case 3
+                    obj.plotFunc = @getPhaseData;
+            end
+            redraw(obj);
+        end
+        
         function redraw(obj)
         % Function to draw plots
             for i=1:obj.p.Results.numPlots
@@ -188,7 +225,8 @@ classdef UiHugePlot < handle
                             SP = getSParams(obj.measments{k}, {SParam});
                             meas{k} = SP{1};
                         catch
-                            warning('Problem loading S-parameter %s ',...
+                            warning('HugePlot:subplot:SParamFail',...
+                                'Problem loading S-parameter %s ',...
                                 SParam);
                         end
                     end
@@ -205,8 +243,8 @@ classdef UiHugePlot < handle
                         if ~isempty(meas{k})
                             xData = getFreq(meas{k});
 
-                            %TODO: Add multiple modes for plotting data
-                            yData = getdBData(meas{k});
+                            % Plot data using chosen function
+                            yData = obj.plotFunc(meas{k});
 
                             % Get a color for the line
                             color = obj.measColors{k};

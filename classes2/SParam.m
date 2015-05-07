@@ -72,6 +72,10 @@ classdef SParam < handle
         % Gets the raw complex data of the S-parameter
             complex = obj.dataArray(:,2);
         end
+        
+        function ph = getPhaseData(obj)
+            ph = phase(obj.dataArray(:,2));
+        end
     end
     
 end
