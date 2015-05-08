@@ -25,6 +25,7 @@ classdef UiHugePlot < handle
         p
         % Plotting function
         plotFunc
+        yLabel
     end
     
     methods
@@ -132,6 +133,7 @@ classdef UiHugePlot < handle
            
            % Set default plotting function
            obj.plotFunc = @getdBData;
+           obj.yLabel = 'Amplitud [dB]';
            
            % Disable warnings if not in verbose mode
            if ~obj.p.Results.verbose
@@ -201,10 +203,13 @@ classdef UiHugePlot < handle
             switch val
                 case 1
                     obj.plotFunc = @getdBData;
+                    obj.yLabel = 'Amplitud [dB]';
                 case 2
                     obj.plotFunc = @getAmplData;
+                    obj.yLabel = 'Amplitud';
                 case 3
                     obj.plotFunc = @getPhaseData;
+                    obj.yLabel = 'Fas [radianer]';
             end
             redraw(obj);
         end
@@ -236,6 +241,8 @@ classdef UiHugePlot < handle
                     sp = subplot(obj.p.Results.numPlots,obj.p.Results.numPlots,currPlot);
                     cla(sp);
                     hold on;
+                    xlabel('Frekvens [Hz]');
+                    ylabel(obj.yLabel);
                     title(strcat('S',num2str(s1),'\_',num2str(s2)));
 
                     % Draw measurements in subplot
