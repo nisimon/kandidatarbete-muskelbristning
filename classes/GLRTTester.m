@@ -7,6 +7,7 @@ classdef GLRTTester < handle
         classes
         knownClasses
         goodSParams
+        classingFreq
     end
     
     methods
@@ -20,6 +21,7 @@ classdef GLRTTester < handle
                     i*ones(1,getNumMeases(classes{i}))];
             end
             obj.goodSParams = cell(0);
+            obj.classingFreq = [];
         end
         
         function predClasses = looCrossValidate(obj)
@@ -29,20 +31,8 @@ classdef GLRTTester < handle
                 % Prioritize specified S-parameters
                 vectSParams = obj.goodSParams;
             else
-                vectSParams = {};
                 % Find names of S-parameters included in all measurements
-                for i = 1:length(obj.classes)
-                    procMeases = getProcMeases(obj.classes{i});
-                    for j = 1:length(procMeases)
-                        if isempty(vectSParams)
-                            vectSParams =...
-                                getIncludedSPNames(procMeases{j});
-                        else
-                            vectSParams = intersect(vectSParams,...
-                                getIncludedSPNames(procMeases{j}));
-                        end
-                    end
-                end
+                vectSParams = getIncSParams(obj);
             end
             
             disp(vectSParams);
@@ -53,7 +43,7 @@ classdef GLRTTester < handle
                 procMeases = getProcMeases(obj.classes{i});
                 for j = 1:length(procMeases)
                     dataMatrix = [dataMatrix...
-                        vectorize(procMeases{j},vectSParams)];
+                        vectorize(procMeases{j},vectSParams,obj.classingFreq)];
                 end
             end
             
@@ -83,6 +73,49 @@ classdef GLRTTester < handle
         
         function [] = setGoodSParams(obj,goodSPs)
             obj.goodSParams = goodSPs;
+        end
+        
+        function [] = setClassingFreq(obj,classingFreq)
+            obj.classingFreq = classingFreq;
+        end
+        
+        function incSParams = getIncSParams(obj)
+            % Find names of S-parameters included in all measurements
+            incSParams = {};
+            for i = 1:length(obj.classes)
+                procMeases = getProcMeases(obj.classes{i});
+                for j = 1:length(procMeases)
+                    if isempty(incSParams)
+                        incSParams =...
+                            getIncludedSPNames(procMeases{j});
+                    else
+                        incSParams = intersect(incSParams,...
+                            getIncludedSPNames(procMeases{j}));
+                    end
+                end
+            end
+        end
+        
+        function SPScores = scoreSParams(obj)
+            incSParams = getIncSParams(obj);
+            emptyCells = cell(size(incSParams));
+            
+            SPScores = struct('name',emptyCells,'score',emptyCells);
+            
+            oldGoodSParams = obj.goodSParams;
+            
+            for i = 1:length(incSParams)
+                currSP = incSParams{i};
+                SPScores(i).name = currSP;
+                
+                setGoodSParams(obj,{currSP});
+                
+                predClasses = looCrossValidate(obj);
+                
+                SPScores(i).score = sum(predClasses == obj.knownClasses);
+            end
+            
+            setGoodSParams(obj,oldGoodSParams);
         end
     end
     

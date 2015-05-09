@@ -73,6 +73,10 @@ classdef SParam < handle
             complex = obj.dataArray(:,2);
         end
         
+        function re = getRealData(obj)
+            re = real(obj.dataArray(:,2));
+        end
+        
         function ph = getPhaseData(obj)
             ph = phase(obj.dataArray(:,2));
         end

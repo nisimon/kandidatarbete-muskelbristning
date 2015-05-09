@@ -46,9 +46,10 @@ classdef SubMeas < handle
                 'UniformOutput',false);
         end
         
-        function vector = vectorize(obj, SNames)
+        function vector = vectorize(obj, SNames, vectFreq)
             % Create list of vectorized S-parameters sorted by name
             % if no names given, use all S-parameters
+            % Uses frequencies in interval [vectFreq(1) vectFreq(2)]
             if isempty(SNames)
                 SNames = cell(size(obj.SParams));
                 for i = 1:length(SNames)
@@ -67,7 +68,12 @@ classdef SubMeas < handle
                 if isExcluded(sortedSParams{i})
                     error('Can''t vectorize excluded S-parameter');
                 end
-                vector = [vector; getComplexData(sortedSParams{i})];
+                vectData = getComplexData(sortedSParams{i});
+                if ~isempty(vectFreq)
+                    freq = getFreq(sortedSParams{i});
+                    vectData = vectData(freq > vectFreq(1) & freq < vectFreq(2));
+                end
+                vector = [vector; vectData];
             end
         end
     end
