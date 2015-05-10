@@ -32,11 +32,13 @@ classdef UiHugePlot < handle
         function obj = UiHugePlot(dataSets, varargin)
             % Parse input arguments
             obj.p = inputParser;
+            defaultShowExcluded = true;
             defaultShowLegend = true;
             defaultClassColors = false;
             defaultVerbose = false;
             defaultNumPlots = 2;
             
+            addOptional(obj.p,'showExcluded',defaultShowExcluded,@islogical);
             addOptional(obj.p,'showLegend',defaultShowLegend,@islogical);
             addOptional(obj.p,'classColors',defaultClassColors,@islogical);
             addOptional(obj.p,'verbose',defaultVerbose,@islogical);
@@ -250,7 +252,9 @@ classdef UiHugePlot < handle
 
                     % Draw measurements in subplot
                     for k=1:length(meas)
-                        if ~isempty(meas{k})
+                        if ~isempty(meas{k}) &&...
+                            (obj.p.Results.showExcluded ||...
+                            ~obj.p.Results.showExcluded && ~isExcluded(meas{k}))
                             xData = getFreq(meas{k});
 
                             % Plot data using chosen function
