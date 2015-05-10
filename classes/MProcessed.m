@@ -87,7 +87,8 @@ classdef MProcessed < SubMeas
                                 SPStruct(i).excl = true;
                             else
                                 SPStruct(i).S =...
-                                    abs(SPStruct(i).S) - getAmplData(refS{1});
+                                    smooth(abs(SPStruct(i).S) -...
+                                    getAmplData(refS{1}),11);
                             end
                         catch E
                             disp(E);
