@@ -29,8 +29,12 @@ classdef Measurement < SuperMeas
             % in measurement directory containing path to reference
             % measurement
             if exist(strcat(path, filesep, 'ref.txt'), 'file') == 2
+                % Change dir for relative paths to work
+                oldDir = pwd;
+                cd(path);
                 refPath = fileread(strcat(path, filesep, 'ref.txt'));
                 obj.mRef = RefMeas(refPath);
+                cd(oldDir);
             else
                 obj.mRef = {};
             end
