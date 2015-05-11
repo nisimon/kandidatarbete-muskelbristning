@@ -83,13 +83,15 @@ classdef UiHugePlot < handle
                 % Generate colors for the measurements
                 newColors = cell(size(newMeases));
                 for j = 1:length(newColors)
-                    r1 = 1 + sign(-mod(i,3)); % Red
-                    g1 = 1 + sign(-mod(i+1,3)); % Green
-                    b1 = 1 + sign(-mod(i+2,3)); % Blue
-                    r = min(r1 + mod(j*0.2*g1 + j*0.2*b1,0.9),1);
-                    g = min(g1 + mod(j*0.2*r1 + j*0.2*b1,0.9),1);
-                    b = min(b1 + mod(j*0.2*r1 + j*0.2*g1,0.9),1);
-                    newColors{j} = [r g b]; 
+                    % MATLAB default colors
+                    col=[0    0.4470    0.7410;
+                        0.8500    0.3250    0.0980;
+                        0.9290    0.6940    0.1250;
+                        0.4940    0.1840    0.5560;
+                        0.4660    0.6740    0.1880;
+                        0.3010    0.7450    0.9330;
+                        0.6350    0.0780    0.1840];
+                    newColors{j} = col(mod(i,7)+1,:); 
                 end
                 obj.measColors = [obj.measColors...
                     newColors];
@@ -214,7 +216,7 @@ classdef UiHugePlot < handle
                     obj.yLabel = 'Fas [radianer]';
                 case 4
                     obj.plotFunc = @getRealData;
-                    obj.yLabel = 'Realvärde';
+                    obj.yLabel = 'Realvï¿½rde';
             end
             redraw(obj);
         end
