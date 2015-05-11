@@ -26,6 +26,14 @@ classdef UiHugePlot < handle
         % Plotting function
         plotFunc
         yLabel
+        % Plot colors (MATLAB default colors)
+        col=[0    0.4470    0.7410;
+            0.8500    0.3250    0.0980;
+            0.9290    0.6940    0.1250;
+            0.4940    0.1840    0.5560;
+            0.4660    0.6740    0.1880;
+            0.3010    0.7450    0.9330;
+            0.6350    0.0780    0.1840];
     end
     
     methods
@@ -80,18 +88,10 @@ classdef UiHugePlot < handle
                             newMeases];
                 obj.measNames = [obj.measNames...
                     newNames];
-                % Generate colors for the measurements
+                % Select colors for the measurements
                 newColors = cell(size(newMeases));
                 for j = 1:length(newColors)
-                    % MATLAB default colors
-                    col=[0    0.4470    0.7410;
-                        0.8500    0.3250    0.0980;
-                        0.9290    0.6940    0.1250;
-                        0.4940    0.1840    0.5560;
-                        0.4660    0.6740    0.1880;
-                        0.3010    0.7450    0.9330;
-                        0.6350    0.0780    0.1840];
-                    newColors{j} = col(mod(i,7)+1,:); 
+                    newColors{j} = obj.col(mod(i,7)+1,:); 
                 end
                 obj.measColors = [obj.measColors...
                     newColors];
@@ -216,7 +216,7 @@ classdef UiHugePlot < handle
                     obj.yLabel = 'Fas [radianer]';
                 case 4
                     obj.plotFunc = @getRealData;
-                    obj.yLabel = 'Realvärde';
+                    obj.yLabel = 'Realdel';
             end
             redraw(obj);
         end
