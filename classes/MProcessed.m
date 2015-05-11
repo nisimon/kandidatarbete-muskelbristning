@@ -87,8 +87,8 @@ classdef MProcessed < SubMeas
                                 SPStruct(i).excl = true;
                             else
                                 SPStruct(i).S =...
-                                    smooth(abs(SPStruct(i).S) -...
-                                    getAmplData(refS{1}),11);
+                                    smooth(20*log10(abs(SPStruct(i).S)) -...
+                                    getdBData(refS{1}),11);
                             end
                         catch E
                             disp(E);
