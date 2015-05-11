@@ -19,10 +19,19 @@ classdef UiErrorPlot < handle
         fig
         % Input parser
         p
+        % Plot colors (MATLAB default colors)
+        col=[0    0.4470    0.7410;
+            0.8500    0.3250    0.0980;
+            0.9290    0.6940    0.1250;
+            0.4940    0.1840    0.5560;
+            0.4660    0.6740    0.1880;
+            0.3010    0.7450    0.9330;
+            0.6350    0.0780    0.1840];
     end
     
     methods
         function obj = UiErrorPlot(dataStruct, varargin)
+            addpath('.\shadedErrorBar');
             % Parse input arguments
             obj.p = inputParser;
             defaultShowLegend = true;
@@ -156,19 +165,24 @@ classdef UiErrorPlot < handle
                     if ~isempty(currSP)
                         % Get array of measurements and names
                         measNames = cell(1,length(currSP.devs));
+                        legendObjects = gobjects(1,length(currSP.devs));
                         for k = 1:length(currSP.devs)
                             % Draw measurements in subplot
-                            plot(currSP.freq,...
-                                currSP.devs(k).mean);
-                            errorbar(currSP.freq(1+2*k:20:end),...
-                                currSP.devs(k).mean(1+2*k:20:end),...
-                                currSP.devs(k).dev(1+2*k:20:end),...
-                                '+');
+                            %plot(currSP.freq,...
+                            %    currSP.devs(k).mean);
+                            color = obj.col(mod(k,7)+1,:);
+                            H = shadedErrorBar(currSP.freq,...
+                                currSP.devs(k).mean,...
+                                currSP.devs(k).dev,...
+                                {'Color',color},...
+                                1);
+                            legendObjects(k) = H.mainLine;
+                            
                             measNames{k} = currSP.devs(k).className;
                         end
                         %Create legend
                         if obj.p.Results.showLegend
-                            legend(measNames,...
+                            legend(legendObjects,measNames,...
                                 'Interpreter','none','Location','best');
                         end
                     else
