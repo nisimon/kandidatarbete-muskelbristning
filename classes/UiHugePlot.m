@@ -216,7 +216,7 @@ classdef UiHugePlot < handle
                     obj.yLabel = 'Fas [radianer]';
                 case 4
                     obj.plotFunc = @getRealData;
-                    obj.yLabel = 'Realv�rde';
+                    obj.yLabel = 'Realvärde';
             end
             redraw(obj);
         end
