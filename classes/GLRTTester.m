@@ -129,7 +129,12 @@ classdef GLRTTester < handle
             
             for i = 1:length(SPDevs)
                 currSPName = SPDevs(i).name;
-                emptyCells = cell(1,length(obj.classes) + 1);
+%                 if length(obj.classes) > 1
+%                     emptyCells = cell(1,length(obj.classes) + 1);
+%                 else
+                    % No "all classes" if only one class
+                    emptyCells = cell(1,length(obj.classes));
+%                 end
                 SPDevs(i).devs = struct('className',emptyCells,...
                     'mean', emptyCells,...
                     'dev', emptyCells);
@@ -156,13 +161,19 @@ classdef GLRTTester < handle
                     end
                     SPDevs(i).devs(j).mean = mean(classData);
                     SPDevs(i).devs(j).dev = std(classData);
-                    totalData = [totalData;
-                        classData];
+%                     if length(obj.classes) > 1
+%                     % No "all classes" if only 1 class
+%                         totalData = [totalData;
+%                             mean(classData)];
+%                     end
                 end
                 SPDevs(i).freq = freq;
-                SPDevs(i).devs(end).className = 'all classes';
-                SPDevs(i).devs(end).mean = mean(totalData);
-                SPDevs(i).devs(end).dev = std(totalData);
+%                 if length(obj.classes) > 1
+%                 % No "all classes" if only 1 class
+%                     SPDevs(i).devs(end).className = 'All classes';
+%                     SPDevs(i).devs(end).mean = mean(totalData);
+%                     SPDevs(i).devs(end).dev = std(totalData);
+%                 end
             end
         end
     end
