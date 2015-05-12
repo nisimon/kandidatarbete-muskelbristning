@@ -40,12 +40,14 @@ classdef UiHugePlot < handle
         function obj = UiHugePlot(dataSets, varargin)
             % Parse input arguments
             obj.p = inputParser;
+            defaultShowReps = true;
             defaultShowExcluded = true;
             defaultShowLegend = true;
             defaultClassColors = false;
             defaultVerbose = false;
             defaultNumPlots = 2;
             
+            addOptional(obj.p,'showReps',defaultShowReps,@islogical);
             addOptional(obj.p,'showExcluded',defaultShowExcluded,@islogical);
             addOptional(obj.p,'showLegend',defaultShowLegend,@islogical);
             addOptional(obj.p,'classColors',defaultClassColors,@islogical);
@@ -75,12 +77,17 @@ classdef UiHugePlot < handle
                         newNames = strcat(getName(dataSet),...
                             ': ', getMeasNames(dataSet));
                     case 'Measurement'
-                        newMeases = getAllMeas(dataSet);
-                        repNames = strcat(getName(dataSet),...
-                            ': ', getRepNames(dataSet));
-                        procName = strcat(getName(dataSet),...
-                            ': ', 'processed');
-                        newNames = [repNames procName];
+                        if obj.p.Results.showReps
+                            newMeases = getAllMeas(dataSet);
+                            repNames = strcat(getName(dataSet),...
+                                ': ', getRepNames(dataSet));
+                            procName = strcat(getName(dataSet),...
+                                ': ', 'processed');
+                            newNames = [repNames procName];
+                        else
+                            newMeases = {getProcMeas(dataSet)};
+                            newNames = {getName(dataSet)};
+                        end
                     otherwise
                         error('No support for plotting class %s', obj.dataClass);
                 end
@@ -143,6 +150,9 @@ classdef UiHugePlot < handle
            if ~obj.p.Results.verbose
                warning('off','HugePlot:subplot:SParamFail');
                warning('off','MATLAB:legend:PlotEmpty');
+           else
+               warning('on','HugePlot:subplot:SParamFail');
+               warning('on','MATLAB:legend:PlotEmpty');
            end
            
            redraw(obj);
@@ -236,10 +246,10 @@ classdef UiHugePlot < handle
                         try
                             SP = getSParams(obj.measments{k}, {SParam});
                             meas{k} = SP{1};
-                        catch
+                        catch E
                             warning('HugePlot:subplot:SParamFail',...
-                                'Problem loading S-parameter %s ',...
-                                SParam);
+                                'Problem loading S-parameter %s: %s ',...
+                                SParam, E.message);
                         end
                     end
 
