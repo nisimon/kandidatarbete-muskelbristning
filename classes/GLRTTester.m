@@ -159,8 +159,8 @@ classdef GLRTTester < handle
                         classData = [classData;
                             dBData'];
                     end
-                    SPDevs(i).devs(j).mean = mean(classData);
-                    SPDevs(i).devs(j).dev = std(classData);
+                    SPDevs(i).devs(j).mean = mean(classData,1);
+                    SPDevs(i).devs(j).dev = std(classData,0,1);
 %                     if length(obj.classes) > 1
 %                     % No "all classes" if only 1 class
 %                         totalData = [totalData;
