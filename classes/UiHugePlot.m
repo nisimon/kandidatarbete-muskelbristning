@@ -290,10 +290,12 @@ classdef UiHugePlot < handle
                     end
                     
                     %Create legend
-                    if obj.p.Results.showLegend &&...
-                            length(obj.measNames) >= 1
-                        legend(obj.measNames(~cellfun('isempty', meas)),...
-                            'Interpreter','none','Location','best');
+                    if length(obj.measNames) >= 1
+                        leg = legend(obj.measNames(~cellfun('isempty', meas)),...
+                                'Interpreter','none','Location','best');
+                        if ~obj.p.Results.showLegend
+                            set(leg, 'visible', 'off');
+                        end
                     end
                 end
             end
