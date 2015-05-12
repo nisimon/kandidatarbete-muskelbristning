@@ -34,10 +34,12 @@ classdef UiErrorPlot < handle
             addpath(strcat('.',filesep,'shadedErrorBar'));
             % Parse input arguments
             obj.p = inputParser;
+            defaultShowError = true;
             defaultShowLegend = true;
             defaultVerbose = false;
             defaultNumPlots = 2;
             
+            addOptional(obj.p,'showError',defaultShowError,@islogical);
             addOptional(obj.p,'showLegend',defaultShowLegend,@islogical);
             addOptional(obj.p,'verbose',defaultVerbose,@islogical);
             addOptional(obj.p,'numPlots',defaultNumPlots,@isnumeric);
@@ -171,12 +173,19 @@ classdef UiErrorPlot < handle
                             %plot(currSP.freq,...
                             %    currSP.devs(k).mean);
                             color = obj.col(mod(k,7)+1,:);
-                            H = shadedErrorBar(currSP.freq,...
+                            if obj.p.Results.showError
+                                H = shadedErrorBar(currSP.freq,...
+                                    currSP.devs(k).mean,...
+                                    currSP.devs(k).dev,...
+                                    {'Color',color},...
+                                    1);
+                                legendObjects(k) = H.mainLine;
+                            else
+                                H = plot(currSP.freq,...
                                 currSP.devs(k).mean,...
-                                currSP.devs(k).dev,...
-                                {'Color',color},...
-                                1);
-                            legendObjects(k) = H.mainLine;
+                                'Color',color);
+                                legendObjects(k) = H;
+                            end
                             
                             measNames{k} = currSP.devs(k).className;
                         end
