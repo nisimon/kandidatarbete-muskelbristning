@@ -31,7 +31,7 @@ classdef UiErrorPlot < handle
     
     methods
         function obj = UiErrorPlot(dataStruct, varargin)
-            addpath('.\shadedErrorBar');
+            addpath(strcat('.',filesep,'shadedErrorBar'));
             % Parse input arguments
             obj.p = inputParser;
             defaultShowLegend = true;
