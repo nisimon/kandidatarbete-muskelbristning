@@ -298,7 +298,5 @@ classdef UiHugePlot < handle
                 end
             end
         end
-    end
-    
+    end 
 end
-
