@@ -88,6 +88,13 @@ classdef UiHugePlot < handle
                             newMeases = {getProcMeas(dataSet)};
                             newNames = {getName(dataSet)};
                         end
+                    case 'cell'
+                        newMeases = cell(1,length(dataSet));
+                        newNames = cell(1,length(dataSet));
+                        for j = 1:length(newMeases);
+                            newMeases{j} = getProcMeas(dataSet{j});
+                            newNames{j} = getName(dataSet{j});
+                        end
                     otherwise
                         error('No support for plotting class %s', obj.dataClass);
                 end
