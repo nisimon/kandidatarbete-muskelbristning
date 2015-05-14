@@ -80,6 +80,12 @@ classdef SParam < handle
         function ph = getPhaseData(obj)
             ph = phase(obj.dataArray(:,2));
         end
+        
+        function intAmp = getIntAmp(obj)
+            % Get total integrated amplitude
+            intAmp = trapz(obj.dataArray(:,1),...
+                abs(obj.dataArray(:,2)));
+        end
     end
     
 end
